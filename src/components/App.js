@@ -1,9 +1,10 @@
 import ReviewList from "./ReviewList";
-import mockItems from "../mock.json";
+// import mockItems from "../mock.json";
 import { useState } from "react";
+import { getReviews } from "../api";
 
 function App() {
-  const [items, setItems] = useState(mockItems);
+  const [items, setItems] = useState([]);
   // 정렬 기준을 선택할 수 있도록
   const [order, setOrder] = useState("createdAt");
   // 별점이 높은 순서대로 정렬
@@ -17,6 +18,10 @@ function App() {
     const nextItems = items.filter((item) => item.id !== id);
     setItems(nextItems);
   };
+  const handleLoadClick = async () => {
+    const { reviews } = await getReviews();
+    setItems(reviews);
+  };
   return (
     <div>
       <div>
@@ -24,6 +29,7 @@ function App() {
         <button onClick={handleBestClick}>별점순</button>
       </div>
       <ReviewList items={sortedItems} onDelete={handleDelete} />
+      <button onClick={handleLoadClick}>불러오기</button>
     </div>
   );
 }
