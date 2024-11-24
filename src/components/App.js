@@ -25,7 +25,7 @@ function App() {
   const handleLoad = async (options) => {
     const { reviews, paging } = await getReviews(options);
     if (options.offset === 0) setItems(reviews);
-    else setItems([...items, ...reviews]);
+    else setItems((preItems) => [...preItems, ...reviews]);
     setOffset(options.offset + reviews.length);
     setHasNext(paging.hasNext);
   };
