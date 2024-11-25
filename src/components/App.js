@@ -9,6 +9,8 @@ function App() {
   const [offset, setOffset] = useState(0);
   const [hasNext, setHasNext] = useState(false);
   const [items, setItems] = useState([]);
+  // 리퀘스트 로딩중일 때 처리
+  const [isLoading, setIsLoading] = useState(false);
   // 정렬 기준을 선택할 수 있도록
   const [order, setOrder] = useState("createdAt");
   // 별점이 높은 순서대로 정렬
@@ -23,7 +25,16 @@ function App() {
     setItems(nextItems);
   };
   const handleLoad = async (options) => {
-    const { reviews, paging } = await getReviews(options);
+    let result;
+    try {
+      setIsLoading(true);
+      result = await getReviews(options);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+    const { reviews, paging } = result;
     if (options.offset === 0) setItems(reviews);
     else setItems((preItems) => [...preItems, ...reviews]);
     setOffset(options.offset + reviews.length);
@@ -46,7 +57,11 @@ function App() {
         <button onClick={handleBestClick}>별점순</button>
       </div>
       <ReviewList items={sortedItems} onDelete={handleDelete} />
-      {hasNext && <button onClick={handleLoadMore}>더 보기</button>}
+      {hasNext && (
+        <button disabled={isLoading} onClick={handleLoadMore}>
+          더 보기
+        </button>
+      )}
     </div>
   );
 }
