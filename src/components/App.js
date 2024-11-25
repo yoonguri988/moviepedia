@@ -11,6 +11,8 @@ function App() {
   const [items, setItems] = useState([]);
   // 리퀘스트 로딩중일 때 처리
   const [isLoading, setIsLoading] = useState(false);
+  // 잘못된 리퀘스트
+  const [loadingError, setLoadingError] = useState(null);
   // 정렬 기준을 선택할 수 있도록
   const [order, setOrder] = useState("createdAt");
   // 별점이 높은 순서대로 정렬
@@ -28,9 +30,11 @@ function App() {
     let result;
     try {
       setIsLoading(true);
+      setLoadingError(null);
       result = await getReviews(options);
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      setLoadingError(error);
+      return;
     } finally {
       setIsLoading(false);
     }
@@ -62,6 +66,7 @@ function App() {
           더 보기
         </button>
       )}
+      {loadingError?.message && <span>{loadingError.message}</span>}
     </div>
   );
 }
