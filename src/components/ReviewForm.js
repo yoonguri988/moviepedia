@@ -2,39 +2,39 @@ import { useState } from "react";
 import "./ReviewForm.css";
 
 function ReviewForm() {
-  const [title, setTitle] = useState("");
-  const [rating, setRating] = useState(0);
-  const [context, setContext] = useState("");
+  const [values, setValues] = useState({
+    title: "",
+    rating: 0,
+    context: "",
+  });
 
-  const handleTitleChange = (e) => {
-    setTitle(e.target.value);
-  };
-  const handleRatingChange = (e) => {
-    setRating(Number(e.target.value) || 0);
-  };
-  const handleContextChange = (e) => {
-    setContext(e.target.value);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setValues((prevValues) => ({
+      ...prevValues,
+      [name]: value,
+    }));
   };
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(`${title} ${rating} ${context}`);
+    console.log(values);
   };
 
   return (
     <form className="ReviewForm" onSubmit={handleSubmit}>
       <input
         type="text"
+        value={values.title}
         name="title"
-        value={title}
-        onChange={handleTitleChange}
+        onChange={handleChange}
       />
       <input
         type="number"
+        value={values.rating}
         name="rating"
-        value={rating}
-        onChange={handleRatingChange}
+        onChange={handleChange}
       />
-      <textarea name="context" value={context} onChange={handleContextChange} />
+      <textarea name="context" value={values.context} onChange={handleChange} />
       <button type="submit">확인</button>
     </form>
   );
