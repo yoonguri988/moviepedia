@@ -15,8 +15,13 @@ function ReviewForm() {
   const handleContextChange = (e) => {
     setContext(e.target.value);
   };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(`${title} ${rating} ${context}`);
+  };
+
   return (
-    <div className="ReviewForm">
+    <form className="ReviewForm" onSubmit={handleSubmit}>
       <input
         type="text"
         name="title"
@@ -30,7 +35,8 @@ function ReviewForm() {
         onChange={handleRatingChange}
       />
       <textarea name="context" value={context} onChange={handleContextChange} />
-    </div>
+      <button type="submit">확인</button>
+    </form>
   );
 }
 
