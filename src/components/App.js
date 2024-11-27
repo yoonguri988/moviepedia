@@ -46,14 +46,13 @@ function App() {
     setHasNext(paging.hasNext);
   };
 
-  const handleLoadMore = () => {
+  const handleLoadMore = async () => {
     // 다음 페이지를 불러올 함수
-    handleLoad({ order, offset, limit: LIMIT });
+    await handleLoad({ order, offset, limit: LIMIT });
   };
 
   useEffect(() => {
     handleLoad({ order, offset: 0, limit: LIMIT });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [order]);
   return (
     <div>
