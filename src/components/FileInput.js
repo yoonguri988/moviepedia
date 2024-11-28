@@ -18,13 +18,16 @@ function FileInput({ name, value, onChange }) {
   };
 
   useEffect(() => {
-    if (!value) {
-      setPreview("");
-      return;
-    }
+    if (!value) return;
 
     const nextPreview = URL.createObjectURL(value);
     setPreview(nextPreview);
+
+    return () => {
+      // 메모리 할당 정리하고 사이드 이펙트도 정리
+      setPreview();
+      URL.revokeObjectURL(nextPreview);
+    };
   }, [value]);
   return (
     <div>
