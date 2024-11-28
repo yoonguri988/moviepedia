@@ -2,6 +2,7 @@ import ReviewList from "./ReviewList";
 // import mockItems from "../mock.json";
 import { useEffect, useState } from "react";
 import { getReviews } from "../api";
+import ReviewForm from "./ReviewForm";
 
 const LIMIT = 6;
 function App() {
@@ -45,14 +46,13 @@ function App() {
     setHasNext(paging.hasNext);
   };
 
-  const handleLoadMore = () => {
+  const handleLoadMore = async () => {
     // 다음 페이지를 불러올 함수
-    handleLoad({ order, offset, limit: LIMIT });
+    await handleLoad({ order, offset, limit: LIMIT });
   };
 
   useEffect(() => {
     handleLoad({ order, offset: 0, limit: LIMIT });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [order]);
   return (
     <div>
@@ -60,6 +60,7 @@ function App() {
         <button onClick={handleNewestClick}>최신순</button>
         <button onClick={handleBestClick}>별점순</button>
       </div>
+      <ReviewForm />
       <ReviewList items={sortedItems} onDelete={handleDelete} />
       {hasNext && (
         <button disabled={isLoading} onClick={handleLoadMore}>
