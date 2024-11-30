@@ -7,11 +7,11 @@ import { createReview } from "../api";
 const INIT_VALUES = {
   title: "",
   rating: 0,
-  context: "",
+  content: "",
   imgFile: null,
 };
 
-function ReviewForm() {
+function ReviewForm({ onSubmitSuccess }) {
   const [values, setValues] = useState(INIT_VALUES);
   // 로딩 및 에러 처리
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,11 +35,12 @@ function ReviewForm() {
     formData.append("imgFile", values.imgFile);
     formData.append("title", values.title);
     formData.append("rating", values.rating);
-    formData.append("context", values.context);
+    formData.append("context", values.content);
+    let result;
     try {
       setIsSubmitting(true);
       setSubmittingErr(false);
-      await createReview(formData);
+      result = await createReview(formData);
     } catch (e) {
       setSubmittingErr(e);
       return;
@@ -47,6 +48,8 @@ function ReviewForm() {
       setIsSubmitting(false);
     }
     //리퀘스트가 끝나면 폼 초기화
+    const { reviews } = result;
+    onSubmitSuccess(reviews);
     setValues(INIT_VALUES);
   };
 
@@ -70,7 +73,7 @@ function ReviewForm() {
       />
       <textarea
         name="context"
-        value={values.context}
+        value={values.content}
         onChange={handleInputChange}
       />
       <button type="submit" disabled={isSubmitting}>
