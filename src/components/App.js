@@ -1,7 +1,7 @@
 import ReviewList from "./ReviewList";
 // import mockItems from "../mock.json";
 import { useEffect, useState } from "react";
-import { createReview, getReviews, updateReview } from "../api";
+import { createReview, deleteReview, getReviews, updateReview } from "../api";
 import ReviewForm from "./ReviewForm";
 
 const LIMIT = 6;
@@ -22,10 +22,16 @@ function App() {
   // State 값을 사용자가 선택
   const handleNewestClick = () => setOrder("createdAt");
   const handleBestClick = () => setOrder("rating");
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
+    // 비동기 함수로 바꿈
+    const result = await deleteReview(id);
+    if (!result) return;
+
+    setItems((prevItems) => prevItems.filter((item) => item.id !== id));
+
     // filter를 통해 해당 id를 제외한 나머지 items를 불러옴
-    const nextItems = items.filter((item) => item.id !== id);
-    setItems(nextItems);
+    // const nextItems = items.filter((item) => item.id !== id);
+    // setItems(nextItems);
   };
   const handleLoad = async (options) => {
     let result;
