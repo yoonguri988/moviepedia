@@ -2,17 +2,22 @@ import { useState } from "react";
 import "./ReviewForm.css";
 import FileInput from "./FileInput";
 import RatingInput from "./RatingInput";
-import { createReview } from "../api";
 
 const INIT_VALUES = {
   title: "",
   rating: 0,
   content: "",
-  imgFile: null,
+  imgUrl: null,
 };
 
-function ReviewForm({ onSubmitSuccess }) {
-  const [values, setValues] = useState(INIT_VALUES);
+function ReviewForm({
+  initalValues = INIT_VALUES,
+  initalPreview,
+  onSubmit,
+  onSubmitSuccess,
+  onCancel,
+}) {
+  const [values, setValues] = useState(initalValues);
   // 로딩 및 에러 처리
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittingErr, setSubmittingErr] = useState();
@@ -32,15 +37,15 @@ function ReviewForm({ onSubmitSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append("imgFile", values.imgFile);
     formData.append("title", values.title);
     formData.append("rating", values.rating);
-    formData.append("context", values.content);
+    formData.append("content", values.content);
+    formData.append("imgFile", values.imgFile);
     let result;
     try {
+      setSubmittingErr(null);
       setIsSubmitting(true);
-      setSubmittingErr(false);
-      result = await createReview(formData);
+      result = await onSubmit(formData);
     } catch (e) {
       setSubmittingErr(e);
       return;
@@ -48,9 +53,9 @@ function ReviewForm({ onSubmitSuccess }) {
       setIsSubmitting(false);
     }
     //리퀘스트가 끝나면 폼 초기화
-    const { reviews } = result;
-    onSubmitSuccess(reviews);
+    const { review } = result;
     setValues(INIT_VALUES);
+    onSubmitSuccess(review);
   };
 
   return (
@@ -58,6 +63,7 @@ function ReviewForm({ onSubmitSuccess }) {
       <FileInput
         name="imgFile"
         value={values.imgFile}
+        initalPreview={initalPreview}
         onChange={handleChange}
       />
       <RatingInput
@@ -72,10 +78,15 @@ function ReviewForm({ onSubmitSuccess }) {
         onChange={handleInputChange}
       />
       <textarea
-        name="context"
+        name="content"
         value={values.content}
         onChange={handleInputChange}
       />
+      {onCancel && (
+        <button type="button" onClick={onCancel}>
+          취소
+        </button>
+      )}
       <button type="submit" disabled={isSubmitting}>
         확인
       </button>
