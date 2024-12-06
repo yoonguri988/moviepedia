@@ -2,15 +2,25 @@ import { useState } from "react";
 import "./ReviewForm.css";
 import FileInput from "./FileInput";
 import RatingInput from "./RatingInput";
+import useAsync from "./hooks/useAsync";
 
-function ReviewForm() {
-  const [values, setValues] = useState({
-    title: "",
-    rating: 0,
-    context: "",
-    imgFile: null,
-  });
+const INIT_VALUES = {
+  title: "",
+  rating: 0,
+  content: "",
+  imgUrl: null,
+};
 
+function ReviewForm({
+  initalValues = INIT_VALUES,
+  initalPreview,
+  onSubmit,
+  onSubmitSuccess,
+  onCancel,
+}) {
+  const [values, setValues] = useState(initalValues);
+  // 로딩 및 에러 처리
+  const [isSubmitting, submittingErr, onSubmitAsync] = useAsync(onSubmit);
   const handleChange = (name, value) => {
     setValues((prevValues) => ({
       ...prevValues,
@@ -23,9 +33,19 @@ function ReviewForm() {
     handleChange(name, value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(values);
+    const formData = new FormData();
+    formData.append("title", values.title);
+    formData.append("rating", values.rating);
+    formData.append("content", values.content);
+    formData.append("imgFile", values.imgFile);
+    let result = await onSubmitAsync(formData);
+    if (!result) return;
+    //리퀘스트가 끝나면 폼 초기화
+    const { review } = result;
+    setValues(INIT_VALUES);
+    onSubmitSuccess(review);
   };
 
   return (
@@ -33,6 +53,7 @@ function ReviewForm() {
       <FileInput
         name="imgFile"
         value={values.imgFile}
+        initalPreview={initalPreview}
         onChange={handleChange}
       />
       <RatingInput
@@ -47,11 +68,19 @@ function ReviewForm() {
         onChange={handleInputChange}
       />
       <textarea
-        name="context"
-        value={values.context}
+        name="content"
+        value={values.content}
         onChange={handleInputChange}
       />
-      <button type="submit">확인</button>
+      {onCancel && (
+        <button type="button" onClick={onCancel}>
+          취소
+        </button>
+      )}
+      <button type="submit" disabled={isSubmitting}>
+        확인
+      </button>
+      {submittingErr?.message && <div>{submittingErr.message}</div>}
     </form>
   );
 }
