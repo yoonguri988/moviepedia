@@ -1,6 +1,6 @@
 import ReviewList from "./ReviewList";
 // import mockItems from "../mock.json";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { createReview, deleteReview, getReviews, updateReview } from "../api";
 import ReviewForm from "./ReviewForm";
 import useAsync from "./hooks/useAsync";
@@ -31,15 +31,19 @@ function App() {
     // const nextItems = items.filter((item) => item.id !== id);
     // setItems(nextItems);
   };
-  const handleLoad = async (options) => {
-    let result = await getReviewsAsync(options);
-    if (!result) return;
-    const { reviews, paging } = result;
-    if (options.offset === 0) setItems(reviews);
-    else setItems((preItems) => [...preItems, ...reviews]);
-    setOffset(options.offset + reviews.length);
-    setHasNext(paging.hasNext);
-  };
+  const handleLoad = useCallback(
+    async (options) => {
+      let result = await getReviewsAsync(options);
+      if (!result) return;
+
+      const { reviews, paging } = result;
+      if (options.offset === 0) setItems(reviews);
+      else setItems((preItems) => [...preItems, ...reviews]);
+      setOffset(options.offset + reviews.length);
+      setHasNext(paging.hasNext);
+    },
+    [getReviewsAsync]
+  );
 
   const handleLoadMore = async () => {
     // 다음 페이지를 불러올 함수
@@ -66,7 +70,7 @@ function App() {
 
   useEffect(() => {
     handleLoad({ order, offset: 0, limit: LIMIT });
-  }, [order]);
+  }, [order, handleLoad]);
   return (
     <div>
       <div>
