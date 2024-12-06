@@ -3,6 +3,7 @@ import ReviewList from "./ReviewList";
 import { useEffect, useState } from "react";
 import { createReview, deleteReview, getReviews, updateReview } from "../api";
 import ReviewForm from "./ReviewForm";
+import useAsync from "./hooks/useAsync";
 
 const LIMIT = 6;
 function App() {
@@ -10,10 +11,7 @@ function App() {
   const [offset, setOffset] = useState(0);
   const [hasNext, setHasNext] = useState(false);
   const [items, setItems] = useState([]);
-  // 리퀘스트 로딩중일 때 처리
-  const [isLoading, setIsLoading] = useState(false);
-  // 잘못된 리퀘스트
-  const [loadingError, setLoadingError] = useState(null);
+  const [isLoading, loadingError, getReviewsAsync] = useAsync(getReviews);
   // 정렬 기준을 선택할 수 있도록
   const [order, setOrder] = useState("createdAt");
   // 별점이 높은 순서대로 정렬
@@ -34,17 +32,8 @@ function App() {
     // setItems(nextItems);
   };
   const handleLoad = async (options) => {
-    let result;
-    try {
-      setIsLoading(true);
-      setLoadingError(null);
-      result = await getReviews(options);
-    } catch (error) {
-      setLoadingError(error);
-      return;
-    } finally {
-      setIsLoading(false);
-    }
+    let result = await getReviewsAsync(options);
+    if (!result) return;
     const { reviews, paging } = result;
     if (options.offset === 0) setItems(reviews);
     else setItems((preItems) => [...preItems, ...reviews]);
