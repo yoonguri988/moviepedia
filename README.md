@@ -60,3 +60,5 @@
 
 - Context로 데이터 내려주기
 - Context 값에 State 사용하기
+- Context 코드 분리하기
+- 다국어 기능 완성하기
