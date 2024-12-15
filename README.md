@@ -55,3 +55,15 @@
 - useCallback
   1. useEffect Hook에서 발견한 경고메시지 제거
   - useCallback으로 함수를 고정, 함수 재사용
+
+## 24.12.13 issue
+
+- Context로 데이터 내려주기
+- Context 값에 State 사용하기
+- Context 코드 분리하기
+- 다국어 기능 완성하기
+
+## 24.12.15 issue
+
+- 실습 프로젝트 마무리 짓기
+  1. css 적용
