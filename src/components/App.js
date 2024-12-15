@@ -4,10 +4,27 @@ import { useCallback, useEffect, useState } from "react";
 import { createReview, deleteReview, getReviews, updateReview } from "../api";
 import ReviewForm from "./ReviewForm";
 import useAsync from "./hooks/useAsync";
-import { LocaleProvider } from "../contexts/LocaleContext";
 import LocaleSelect from "./LocaleSelect";
+import useTranslate from "./hooks/useTranslate";
+import "./App.css";
+import logo from "../assets/logo.png";
+import ticketImg from "../assets/ticket.png";
+
 
 const LIMIT = 6;
+
+function AppSortButton({ selected, children, onClick }) {
+  return (
+    <button
+      disabled={selected}
+      className={`AppSortButton ${selected ? "selected" : ""}`}
+      onClick={onClick}
+    >
+      {children}
+    </button>
+  );
+}
+
 function App() {
   // 더 불러오기: offset기반 페이지네이션
   const [offset, setOffset] = useState(0);
@@ -18,6 +35,7 @@ function App() {
   const [order, setOrder] = useState("createdAt");
   // 별점이 높은 순서대로 정렬
   const sortedItems = items.sort((a, b) => b[order] - a[order]);
+  const t = useTranslate();
 
   // State 값을 사용자가 선택
   const handleNewestClick = () => setOrder("createdAt");
@@ -74,31 +92,65 @@ function App() {
     handleLoad({ order, offset: 0, limit: LIMIT });
   }, [order, handleLoad]);
   return (
-    <LocaleProvider defaultValue={"ko"}>
-      <div>
-        <LocaleSelect />
-        <div>
-          <button onClick={handleNewestClick}>최신순</button>
-          <button onClick={handleBestClick}>별점순</button>
+    <div className="App">
+      <div className="App-nav">
+        <div className="App-nav-container">
+          <img className="App-logo" src={logo} alt="logo" />
+          <LocaleSelect />
         </div>
-        <ReviewForm
-          onSubmit={createReview}
-          onSubmitSuccess={handleCreateSuccess}
-        />
-        <ReviewList
-          items={sortedItems}
-          onDelete={handleDelete}
-          onUpdate={updateReview}
-          onUpdateSuccess={handleUpdateSuccess}
-        />
+      </div>
+      <div className="App-container">
+        <div
+          className="App-ReviewForm"
+          style={{
+            backgroundImage: `url("${ticketImg}")`,
+          }}
+        >
+          <ReviewForm
+            onSubmit={createReview}
+            onSubmitSuccess={handleCreateSuccess}
+          />
+        </div>
+        <div className="App-sorts">
+          <AppSortButton
+            selected={order === "createdAt"}
+            onClick={handleNewestClick}
+          >
+            {t("newest")}
+          </AppSortButton>
+          <AppSortButton
+            selected={order === "rating"}
+            onClick={handleBestClick}
+          >
+            {t("best")}
+          </AppSortButton>
+        </div>
+        <div className="App-ReviewList">
+          <ReviewList
+            className="App-ReviewList"
+            items={sortedItems}
+            onDelete={handleDelete}
+            onUpdate={updateReview}
+            onUpdateSuccess={handleUpdateSuccess}
+          />
+        </div>
         {hasNext && (
-          <button disabled={isLoading} onClick={handleLoadMore}>
+          <button
+            className="App-load-more-button"
+            disabled={isLoading}
+            onClick={handleLoadMore}
+          >
             더 보기
           </button>
         )}
         {loadingError?.message && <span>{loadingError.message}</span>}
+        <div className="App-footer">
+          <div className="App-footer-container">
+            서비스 이용약관 | 개인정보 처리 방침
+          </div>
+        </div>
       </div>
-    </LocaleProvider>
+    </div>
   );
 }
 

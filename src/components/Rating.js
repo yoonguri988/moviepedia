@@ -4,23 +4,23 @@ import "./Rating.css";
 const RATINGS = [1, 2, 3, 4, 5];
 
 function Star({ selected = false, rating, onSelect, onHover }) {
-  const className = `Rating-star ${selected ? "selected" : ""}`;
+  const classNames = `Rating-star ${selected ? "selected" : ""}`;
 
   //onSelect 이 존재할 때만 실행
   const handleClick = onSelect ? () => onSelect(rating) : undefined;
   const handleMouseOver = onHover ? () => onHover(rating) : undefined;
   return (
     <span
-      className={className}
+      className={classNames}
       onClick={handleClick}
       onMouseOver={handleMouseOver}
     >
-      ⁕
+      ★
     </span>
   );
 }
 
-function Rating({ className, value = 0, onSelect, onHover, onMouseOut }) {
+function Rating({ className = "", value = 0, onSelect, onHover, onMouseOut }) {
   return (
     <div className={className} onMouseOut={onMouseOut}>
       {RATINGS.map((rating) => (
